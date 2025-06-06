@@ -144,13 +144,6 @@ def dictionarize_files(input_folder, output_folder):
         for token in tokenized_text:
             dictionarized_text.append(dictionary[str(token)])
 
-        # One-hot encode dictionarized text
-        length = len(dictionary)
-        for i in range(len(dictionarized_text)):
-            one_hot = [0] * length
-            one_hot[dictionarized_text[i]] = 1
-            dictionarized_text[i] = one_hot
-
         # Get the base name of the current .txt file
         base_name = os.path.basename(file_path)
 
@@ -277,7 +270,7 @@ def tensorize_files(input_folder, output_folder,
 
         # Define buffer size in order to avoid index out of
         # range errors
-        buffer = config.chunk_length * (memory_length + 1)
+        buffer = memory_length + 1
 
         for sample in range(round(sample_count)):
 
@@ -289,10 +282,12 @@ def tensorize_files(input_folder, output_folder,
 
             for chunk in range(memory_length):
                 
-                X_train.append(chunked_text[sample_index])
+                for token in chunked_text[sample_index]:
+                    X_train.append(token)
                 sample_index += 1
             
-            Y_train.append(chunked_text[sample_index])
+            for token in chunked_text[sample_index]:
+                Y_train.append(token)
 
             X_Y_pair.append(X_train)
             X_Y_pair.append(Y_train)
